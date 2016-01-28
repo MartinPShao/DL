@@ -224,16 +224,28 @@ adasgd <- function(x, y, expr, param_list,
 }
 q1.out.sgdm <- list() 
 q1.out.sgdm[[1]] <- adasgd(q1.x, q1.y, exprs, init, alpha = 0.1, m = 200, 
-                    maxit = 1e4, phi = 0.1)
+                           maxit = 1e4, phi = 0.1)
 q1.out.sgdm[[2]] <- sgdm(q1.x, q1.y, exprs, init, alpha = 0.1, m = 200, 
-                    maxit = 1e4, phi = 0.5)
+                         maxit = 1e4, phi = 0.5)
 q1.out.sgdm[[3]] <- sgdm(q1.x, q1.y, exprs, init, alpha = 0.1, m = 200, 
-                    maxit = 1e4, phi = 0.9)
+                         maxit = 1e4, phi = 0.9)
 
 
 q1.out.adasgd <- sgdm(q1.x, q1.y, exprs, init, alpha = 0.1, m = 200, 
-                         maxit = 1e4)
-
+                      maxit = 1e4)
+q1.tb4 <- rbind(cbind(t(q1.out.ms[[4]][[1]]), 
+                      q1.out.ms[[4]][[6]], 
+                      q1.out.ms[[4]][[2]]), 
+                cbind(t(sapply(q1.out.sgdm, "[[", 1)), 
+                      sapply(q1.out.sgdm, "[[", 6), 
+                      sapply(q1.out.sgdm, "[[", 2)), 
+                cbind(t(q1.out.adasgd[[1]]), 
+                      q1.out.adasgd[[6]], 
+                      q1.out.adasgd[[2]]))
+colnames(q1.tb4)[5:6] <- c("SSE", "n.iter")
+rownames(q1.tb4) <- c("SGD", "SGD with momentum(0.1)", 
+                      "SGD with momentum(0.5)", "SGD with momentum(0.9)", 
+                      "AdaSGD")
 
 
 ## 2
@@ -328,35 +340,35 @@ rownames(q2.tb1) <- c("(0.4, 0.45, -0.35, 0.25)",
                       "(0.3, 0.6, -0.3, 0.2)")
 colnames(q2.tb1)[5:6] <- c("cross-entroy", "n.iter")
 
-init <- list(theta0 = 0.3, theta1 = 0.6, theta2 = -0.3, theta3 = 0.2)
+init <- c(theta0 = 0.3, theta1 = 0.6, theta2 = -0.3, theta3 = 0.2)
 alpha <- seq(0.1, 0.9, 0.1)
 q2.out.alphas <- list()
-for (i in 1:5){
-        q2.out.alphas[[i]] <- sgd(q2.x, q2.y, exprs, init, alpha = alpha[i])
-}
-q2.out.alphas[[6]] <- sgd(q2.x, q2.y, exprs, init, alpha = alpha[6])
-q2.out.alphas[[7]] <- sgd(q2.x, q2.y, exprs, init, alpha = alpha[7])
-q2.out.alphas[[8]] <- sgd(q2.x, q2.y, exprs, init, alpha = alpha[8])
-q2.out.alphas[[9]] <- sgd(q2.x, q2.y, exprs, init, alpha = alpha[9])
+q2.out.alphas[[1]] <- sgd_class(q2.x, q2.y, init, alpha = alpha[1])
+q2.out.alphas[[2]] <- sgd_class(q2.x, q2.y, init, alpha = alpha[2])
+q2.out.alphas[[3]] <- sgd_class(q2.x, q2.y, init, alpha = alpha[3])
+q2.out.alphas[[4]] <- sgd_class(q2.x, q2.y, init, alpha = alpha[4])
+q2.out.alphas[[5]] <- sgd_class(q2.x, q2.y, init, alpha = alpha[5])
+q2.out.alphas[[6]] <- sgd_class(q2.x, q2.y, init, alpha = alpha[6])
+q2.out.alphas[[7]] <- sgd_class(q2.x, q2.y, init, alpha = alpha[7])
+q2.out.alphas[[8]] <- sgd_class(q2.x, q2.y, init, alpha = alpha[8])
+q2.out.alphas[[9]] <- sgd_class(q2.x, q2.y, init, alpha = alpha[9])
 q2.tb2 <- cbind(t(sapply(q2.out.alphas, "[[", 1)), 
                 sapply(q2.out.alphas, "[[", 6), 
                 sapply(q2.out.alphas, "[[", 2))
 rownames(q2.tb2) <- paste("alpha=",as.character(alpha), sep = "")
-colnames(q2.tb2)[5:6] <- c("SSE", "n.iter")
+colnames(q2.tb2)[5:6] <- c("cross-entroy", "n.iter")
 
-m <- c(1, 10, 100, 200, 500, 1000)
+m <- c(10, 100, 200, 500)
 q2.out.ms <- list()
-q2.out.ms[[1]] <- sgd(q2.x, q2.y, exprs, init, alpha = 0.1, m = m[1])
-q2.out.ms[[2]] <- sgd(q2.x, q2.y, exprs, init, alpha = 0.1, m = m[2])
-q2.out.ms[[3]] <- sgd(q2.x, q2.y, exprs, init, alpha = 0.1, m = m[3])
-q2.out.ms[[4]] <- sgd(q2.x, q2.y, exprs, init, alpha = 0.1, m = m[4])
-q2.out.ms[[5]] <- sgd(q2.x, q2.y, exprs, init, alpha = 0.1, m = m[5])
-q2.out.ms[[6]] <- sgd(q2.x, q2.y, exprs, init, alpha = 0.1, m = m[6])
+q2.out.ms[[1]] <- sgd_class(q2.x, q2.y, init, alpha = 0.9, m = m[1])
+q2.out.ms[[2]] <- sgd_class(q2.x, q2.y, init, alpha = 0.9, m = m[2])
+q2.out.ms[[3]] <- sgd_class(q2.x, q2.y, init, alpha = 0.9, m = m[3])
+q2.out.ms[[4]] <- sgd_class(q2.x, q2.y, init, alpha = 0.9, m = m[4])
 q2.tb3 <- cbind(t(sapply(q2.out.ms, "[[", 1)), 
                 sapply(q2.out.ms, "[[", 6), 
                 sapply(q2.out.ms, "[[", 2))
 rownames(q2.tb3) <- paste("m=",as.character(m), sep = "")
-colnames(q2.tb3)[5:6] <- c("SSE", "n.iter")
+colnames(q2.tb3)[5:6] <- c("cross-entroy", "n.iter")
 
 
 
@@ -392,7 +404,7 @@ rmsprop <- function(x, y, inits, alpha = 0.5 , m = length(y)/5, rho = 0.9,
                 }
                 obj_last <- obj_cur
                 k <- k + 1
-                print(k)
+                #                 print(k)
                 g_history <- rbind(g_history, t(g))
                 obj_history <- c(obj_history, obj_last)
                 theta_history <- cbind(theta_history, thetas)
@@ -402,7 +414,16 @@ rmsprop <- function(x, y, inits, alpha = 0.5 , m = length(y)/5, rho = 0.9,
                     g_history = g_history, theta_history = theta_history, 
                     obj_last = obj_last, r, v))
 }
-ttt <- rmsprop(x, y, matrix(c(0.3, 0.6, -0.3, 0.2)), alpha = .1)
+q2.out.rmsprops <- list()
+for (i in 1:10){
+        q2.out.rmsprops[[i]] <- rmsprop(q2.x, q2.y, init, alpha = 0.9, m = 100, 
+                                        rho = 0.9, phi = 0.5, maxit = 1e4)
+}
+q2.tb4 <- cbind(1:10, 
+                t(sapply(q2.out.rmsprops, "[[", 1)), 
+                sapply(q2.out.rmsprops, "[[", 6), 
+                sapply(q2.out.rmsprops, "[[", 2))
+colnames(q2.tb4)[c(1,6:7)] <- c("#", "cross-entroy", "n.iter")
 
 save(list = ls(), file = "./hw1output.RData")
 

@@ -1,0 +1,52 @@
+---
+title: "Homework 1"
+author: "Peng Shao"
+date: "January 27, 2016"
+output: pdf_document
+---
+
+```{r, echo=FALSE, include=FALSE}
+library(knitr)
+library(caret)
+setwd("~/Documents/git/DL")
+load(file = "./hw1output.RData")
+```
+
+## Problem 1
+### a).
+
+```{r, echo=FALSE, fig.height=3, fig.width=4, fig.align='center'}
+plot(q1.x, q1.y, pch = 20, cex = 0.1, xlab = "x", ylab = "y")
+lines(q1.x, (theta0+theta1*q1.x)/(1+theta2*exp(theta3*q1.x)))
+```
+
+
+### b). 
+
+For different starting values, 
+```{r, echo=FALSE, fig.height=3, fig.width=4, fig.align='center'}
+kable(q1.tb1, digits = 3)
+plot(q1.x, q1.y, pch = 20, cex = 0.1, xlab = "x", ylab = "y")
+lines(q1.x, eval(exprs, envir = c(as.list(q1.tb1[1, ]), list(x = q1.x))), col = 1, lty = 1)
+lines(q1.x, eval(exprs, envir = c(as.list(q1.tb1[1, ]), list(x = q1.x))), col = 2, lty = 2)
+lines(q1.x, eval(exprs, envir = c(as.list(q1.tb1[1, ]), list(x = q1.x))), col = 3, lty = 3)
+lines(q1.x, eval(exprs, envir = c(as.list(q1.tb1[1, ]), list(x = q1.x))), col = 4, lty = 4)
+lines(q1.x, eval(exprs, envir = c(as.list(q1.tb1[1, ]), list(x = q1.x))), col = 5, lty = 5)
+kable(q1.tb2, digits = 3)
+kable(q1.tb3, digits = 3)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

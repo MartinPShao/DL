@@ -8,103 +8,27 @@ output: pdf_document
 ```{r, echo=FALSE, include=FALSE}
 library(knitr)
 setwd("~/Documents/git/DL")
-load(file = "./hw1output.RData")
+load(file = "./hw2output.RData")
 ```
 
 ## Problem 1
-### a).
 
-```{r, echo=FALSE, fig.height=3, fig.width=4, fig.align='center'}
-plot(q1.x, q1.y, pch = 20, cex = 0.1, xlab = "x", ylab = "y")
-lines(q1.x, (theta0+theta1*q1.x)/(1+theta2*exp(theta3*q1.x)))
-```
-
-
-### b). 
-
-For different starting values, by default, I set $\alpha=0.5$ and $m=\frac{\text{number of observations}}{5}$. The results are list as below
-```{r, echo=FALSE, fig.height=3, fig.width=4, fig.align='center'}
-kable(q1.tb1, digits = 3)
-plot(q1.x, q1.y, pch = 20, cex = 0.1, xlab = "x", ylab = "y")
-lines(q1.x, eval(exprs, envir = c(as.list(q1.tb1[1, ]), list(x = q1.x))), col = 1, lty = 1)
-lines(q1.x, eval(exprs, envir = c(as.list(q1.tb1[1, ]), list(x = q1.x))), col = 2, lty = 2)
-lines(q1.x, eval(exprs, envir = c(as.list(q1.tb1[1, ]), list(x = q1.x))), col = 3, lty = 3)
-lines(q1.x, eval(exprs, envir = c(as.list(q1.tb1[1, ]), list(x = q1.x))), col = 4, lty = 4)
-lines(q1.x, eval(exprs, envir = c(as.list(q1.tb1[1, ]), list(x = q1.x))), col = 5, lty = 5)
-```
-From the table, it seems that $\beta$'s are totally different based on different starting values. We may think that the results are sensitive to the starting values. However, from the graph we can see that all results produce an identical curve, which means that the procedure is not so sensitive to the starting values. Since the starting values are not the problem, then the reason which causes the algorithm converge to a local minima instead of true curve should be either the learning rate or the batch size or both.
-
-From the second table and the third table, we can see that when $\alpha$ is less than 0.3 and $m$ is greater than 100, the result can be very stable and precise, even the number of iteration is not that stable. Thus the algorithm seems useful.
 ```{r, echo=FALSE}
-kable(q1.tb2, digits = 3)
-kable(q1.tb3, digits = 3)
+kable(result_1_1, digits = 3)
+kable(result_1_2, digits = 3)
+kable(result_1_3, digits = 3)
+kable(result_1_4, digits = 3)
+kable(result_1_5, digits = 3)
 ```
-
-I used R this time.
-
-### c).
-
-This time, I set learn rate $\alpha=0.1$ and $m=200$, which are acquired from best models in previous part. This table shows the comparison of the different methods.
-```{r, echo=FALSE}
-kable(q1.tb4, digits = 3)
-```
-
-We can see that based on SSE, the SGD with momentum and AdaGrad algorithm do not perform much better than regular stochastic gradient descent, while the number of iterations of the two methods are at least twice more than that of SGD. So for this problem, SGD algorithm may be better.
 
 
 ## Problem 2
 
-### a).
-
-```{r}
-n <- 500
-p <- 3
-theta <- matrix(c(0.3, 0.6, -0.3, 0.2))
-x <- list()
-pi <- list()
-y <- list()
-
-logis <- function(x){
-        return(1/(1+exp(-x)))
-}
-
-for (i in 1:5){
-        x[[i]] <- cbind(rep(1, n), matrix(rnorm(n*p), nrow = n, ncol = p))
-        pi[[i]] <- logis(x[[i]] %*% theta)
-        y[[i]] <- round(pi[[i]])
-}
-percent_one <- sapply(y, sum)/(n*p)
-percent_one
-```
-
-
-### b).
-
 
 ```{r, echo=FALSE}
-kable(q2.tb1, digits = 3)
-kable(q2.tb2, digits = 3)
-kable(q2.tb3, digits = 3)
+kable(result_2_1, digits = 3)
+kable(result_2_2, digits = 3)
+kable(result_2_3, digits = 3)
+kable(result_2_4, digits = 3)
+kable(result_2_5, digits = 3)
 ```
-
-From the tables above, I can find that: 
-
-1. The algorithm is very sensitive to the starting values. To be specific, when the starting values are near origin, the algorithm will converge to the points which is also near origin (different points of convergence from different starting values are very close), but these results have a relative large error; when the starting values are far from the origin, the algorithm will converge to the points which is also far from origin (There points are also far from each other), but these results have a relative small error. It means that the objection function of this problem may not be convex and have multiple local minima far from zero. 
-
-2. The algorithm is not that sensitive to learning rate and batch size compared to starting values. The trend is that larger learning rate and larger batch size are, the smaller error is.
-
-3. If we choose the wrong starting value, like origin, the algorithm cannot find the local minima far from the starting point, no matter what the learning rate and the batch size are, because it got stuck in the nearest local minima. So the choice of starting values is very important for SGD in this problem.
-
-
-
-### c).
-
-I run the 10 times RMSProp with momentum under the same condition, and the results are listed below.
-```{r, echo=FALSE}
-kable(q2.tb4, digits = 3)
-```
-
-Generally speaking, the this algorithm performs much better than SGD. What is interesting thing, I think, is that RMSProp with momentum would not get stuck in local minima, which indicates that this algorithm is more robust. So the results of convergence is the points far from origin even the starting values is near the origin as before.
-
-
-

@@ -373,7 +373,7 @@ for (k in 1:6){
         nn_bp_2 <- nn_bp_sgd_2(input = wine_train_input, 
                                output = wine_train_output, 
                                rang = 0.7, 
-                               lambda = 10, 
+                               lambda = 1, 
                                gamma = gammas[k])
         pred_bp_2 <- predict_bp_2(wine_test_input, 
                                   wine_test_output, 
@@ -392,7 +392,7 @@ for (k in 1:5){
         nn_bp_2 <- nn_bp_sgd_2(input = wine_train_input, 
                                output = wine_train_output, 
                                rang = 0.7, 
-                               lambda = 10, 
+                               lambda = 1, 
                                gamma = 0.005, 
                                size = hiddens[k])
         pred_bp_2 <- predict_bp_2(wine_test_input, 
@@ -421,7 +421,7 @@ dim_names <- list(c("nnet", paste("m=", ms, sep = "")),
 result_2_5 <- matrix(numeric(4*2), ncol = 2, dimnames = dim_names)
 nnet_2 <- nnet(x = wine_train_input, 
                y = wine_train_output, 
-               size = 10,
+               size = 50,
                softmax = TRUE, 
                rang = 0.7, 
                decay = 1,
@@ -435,9 +435,10 @@ for (k in 1:3){
         nn_bp_2 <- nn_bp_sgd_2(input = wine_train_input, 
                                output = wine_train_output, 
                                rang = 0.7, 
-                               lambda = 10, 
+                               lambda = 1, 
                                gamma = 0.1, 
-                               m = ms[k])
+                               m = ms[k], 
+                               size = 50)
         pred_bp_2 <- predict_bp_2(wine_test_input, 
                                   wine_test_output, 
                                   nn_bp_2)
@@ -450,5 +451,5 @@ ce_test_base <- crossentropy(wine_test_output, y_hat)
 y_hat <- matrix(rep(1/3, nrow(wine_train_output)*ncol(wine_train_output)), 
                 nrow = nrow(wine_train_output), ncol = ncol(wine_train_output))
 ce_train_base <- crossentropy(wine_train_output, y_hat)
-
+save(list = ls(), file = "./hw2output.RData")
 

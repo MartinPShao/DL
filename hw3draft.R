@@ -11,8 +11,8 @@ setwd("~/Documents/git/DL")
 
 load(file = "./hw3q1_data.RData")
 library(EBImage)
-draw <- function(mat){
-        image(t(mat)[,ncol(mat):1], axes = FALSE, col = grey(seq(0, 1, length = 256)))
+draw <- function(mat, main = ""){
+        image(t(mat)[,ncol(mat):1], axes = FALSE, col = grey(seq(0, 1, length = 256)), main=main)
 }
 par(mfrow = c(3, 3), oma = c(0, 0, 0, 0), mar = c(1, 1, 1, 1))
 
@@ -257,6 +257,154 @@ SEARCH <- function(iter = 1000, size = 20, w = 0.729,
 
 
 ## 2
+
+# a
+k <- 32
+ising <- matrix(sample(c(0, 1), k*k, replace = TRUE), ncol = k)
+par(mfrow = c(3, 2))
+draw(ising, main = "initial status")
+
+betas <- c(0.2, 0.5, 0.75, 0.9, 1.25)
+for(n in 1:5){
+        beta <- betas[n]
+        ising_vec <- as.numeric(ising)
+        for (t in 1:2000){
+                for (i in 1:length(ising_vec)){
+                        neighbor <- c()
+                        if (i+1<=length(ising_vec)) neighbor <- c(neighbor, ising_vec[i+1])
+                        if (i+k<=length(ising_vec)) neighbor <- c(neighbor, ising_vec[i+k])
+                        if (i-1>0) neighbor <- c(neighbor, ising_vec[i-1])
+                        if (i-k>0) neighbor <- c(neighbor, ising_vec[i-k])
+                        p <- exp(beta*sum(neighbor==1))/(exp(beta*sum(neighbor==1))+exp(beta*sum(neighbor==0)))
+                        U <- runif(1)
+                        if (U<p)
+                                ising_vec[i] <- 1
+                        else
+                                ising_vec[i] <- 0
+                }
+        }
+        ising_mat <- matrix(ising_vec, nrow = k)
+        draw(ising_mat, main = paste("beta=", beta, sep = ""))
+}
+
+
+# b
+library(pscl)
+x <- runif(10)
+q <- 1/2
+r <- 1/2 #rate, instead of scale, to be same definition in rigamma of package pscl
+Sigma <- diag(c(100, 100))
+beta0 <- rnorm(1, 0, Sigma[1, 1])
+beta1 <- rnorm(1, 0, Sigma[2, 2])
+sigma_2 <- rigamma(1, q, r)
+betas <- matrix(NA, nrow = 100, ncol = 2)
+sigma_2s <- numeric(100)
+y <- beta0+beta1*x+sigma_2
+X <- cbind(1, x)
+for (t in 1:10){
+        repeat{
+                mu <- solve(t(X)%*%X+sigma_2*Sigma)%*%t(X)%*%y
+                S <- sigma_2*solve(t(X)%*%X+sigma_2*Sigma) 
+                beta0_star <- rnorm(1, mu[1], S[1, 1])
+                beta1_star <- rnorm(1, mu[2], S[2, 2])
+                sigma_2_star <- rigamma(1, q+10/2, 
+                                        r+1/2*sum((y-beta0_star-beta1_star*x)^2))
+                y_star <- beta0_star+beta1_star*x+sigma_2_star
+                if (ks.test(y, y_star)$p.value>0.5){
+                        beta0 <- beta0_star1
+                        beta1 <- beta1_star2
+                        sigma_2 <- sigma_2_star
+                        betas[t, 1] <- beta0_star
+                        betas[t, 2] <- beta1_star
+                        sigma_2s[t] <- sigma_2_star
+                        break
+                }
+        }
+        
+}
+
+
+
+# c
+myst_im <- as.matrix(read.table(file = "./myst_im.dat"))
+draw(myst_im)
+size <- nrow(myst_im)
+x <-as.numeric(matrix(sample(c(0, 1), size*size, replace = TRUE), ncol = size))
+beta <- 0.5
+sigma2 <- 1
+q <- 1/2
+r <- 1/2
+tau <- 100
+B <- 1
+y <- as.numeric(myst_im)
+start_q3_c <- Sys.time()
+for (t in 1:10){
+        hx <- c()
+        hz <- c()
+        for (s in 1:20){
+                x_prime <- 1-x
+                for (i in 1:length(x)){
+                        neighbor <- c()
+                        if (i+1<=length(x)) neighbor <- c(neighbor, x[i+1])
+                        if (i+k<=length(x)) neighbor <- c(neighbor, x[i+k])
+                        if (i-1>0) neighbor <- c(neighbor, x[i-1])
+                        if (i-k>0) neighbor <- c(neighbor, x[i-k])
+                        d <- beta*sum(neighbor==x[i])+(-1/(2*sigma2)*(y[i]-x[i])^2)
+                        d_prime <- beta*sum(neighbor==x_prime[i])+(-1/(2*sigma2)*(y[i]-x_prime[i])^2)
+                        p <- exp(min(c(d_prime-d), 0))
+                        U <- runif(1)
+                        if (U<p)
+                                x[i] <- x_prime[i]
+                }
+        }
+        sigma2 <- rigamma(1, q+size*size/2, (r+1/2*sum((y-x)^2)))
+        beta_star <- rnorm(1, beta, B)
+        z <- x
+        for (M in 1:10){
+                for (i in 1:length(z)){
+                        neighbor <- c()
+                        if (i+1<=length(z)) neighbor <- c(neighbor, z[i+1])
+                        if (i+k<=length(z)) neighbor <- c(neighbor, z[i+k])
+                        if (i-1>0) neighbor <- c(neighbor, z[i-1])
+                        if (i-k>0) neighbor <- c(neighbor, z[i-k])
+                        p <- exp(beta_star*sum(neighbor==1))/
+                                (exp(beta_star*sum(neighbor==1))+exp(beta_star*sum(neighbor==0)))
+                        U <- runif(1)
+                        if (U<p)
+                                z[i] <- 1
+                        else
+                                z[i] <- 0
+                }
+        }
+        for (i in 1:length(z)){
+                neighbor <- c()
+                if (i+1<=length(z)) neighbor <- c(neighbor, z[i+1])
+                if (i+k<=length(z)) neighbor <- c(neighbor, z[i+k])
+                if (i-1>0) neighbor <- c(neighbor, z[i-1])
+                if (i-k>0) neighbor <- c(neighbor, z[i-k])
+                hz[i] <- sum(neighbor==z[i])
+        }
+        hz <- sum(hz)
+        for (i in 1:length(x)){
+                neighbor <- c()
+                if (i+1<=length(x)) neighbor <- c(neighbor, x[i+1])
+                if (i+k<=length(z)) neighbor <- c(neighbor, x[i+k])
+                if (i-1>0) neighbor <- c(neighbor, x[i-1])
+                if (i-k>0) neighbor <- c(neighbor, x[i-k])
+                hx[i] <- sum(neighbor==x[i])
+        }
+        hx <- sum(hx)
+        if (abs(hx-hz)<1e-3*hx){
+                ratio <- ((dnorm(beta_star, 0, tau))/(dnorm(beta, 0, tau)))/
+                        ((dnorm(beta, beta_star, B))/(dnorm(beta_star, beta, B)))
+                u <- runif(1)
+                if (u<ratio)
+                        beta <- beta_star
+        }
+        print(t)
+}
+dur_q3_c <- Sys.time()-start_q3_c
+
 
 
 

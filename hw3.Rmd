@@ -1,0 +1,19 @@
+---
+title: "STAT 9100 Homework 3"
+author: "Peng Shao"
+date: "March 8, 2016"
+output: html_document
+---
+
+## Problem 1
+### a).
+### b).
+### c).
+### d).
+### e).
+### f).
+
+## Problem 2
+### a).
+### b).
+### c).

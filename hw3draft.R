@@ -407,4 +407,10 @@ dur_q3_c <- Sys.time()-start_q3_c
 
 
 
+load(file = "./hw3q2cresults.RData")
+
+posterior.x <- Reduce(mean, xs_q2c)
+posterior.image <- matrix(posterior.x/10000, nrow = 64)
+draw(posterior.image)
+
 

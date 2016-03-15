@@ -1,0 +1,78 @@
+---
+title: "STAT 9100 HOMEWORK 4"
+author: "Peng Shao"
+date: "March 13, 2016"
+output: pdf_document
+---
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+load("./hw4results.RData")
+library('knitr')
+```
+
+## 1
+
+### a. 
+Firstly, I tried two candidates for each parameter to explore how the values of parameters affect the model. The comparisons of performances are shown as below, where n is the number of hidden units, eta is learning rate and niter is the number of iterations.
+```{r, tab.cap="This is the head of the Iris table", echo=FALSE}
+table_1 <- cbind(params, mse = c(sapply(results[1:8], "[", 200), 
+                                 sapply(results[9:16], "[", 100)), 
+                 time = dur_time)
+kable(table_1, format = "markdown")
+```
+
+We can see that the learning rate has the most important effect and larger learning rate will lead the smaller mse and shorter runtime. So I try to increase the learning rate, and when the learning rate is larger than 0.5, there is no significant difference any more. Then I change the other three parameters and find that increasing these parameters does not greatly reduce the mse but will cost much more time. Hence the parameters of the final model I choose are: `batch_size=50`, `n=20`, `eta = 0.5` and `niter = 200`. The final MSE is about 41 on average and the program only takes 55 seconds.
+
+
+### b. 
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+load("./hw4q1bcdresults.RData")
+```
+```{r, echo=FALSE, fig.height=3.5, fig.width=5, fig.align='center'}
+plot(results[[1]], type = "l", xlab = "epoch", ylab = "MSE", main =  "MSE by epoch")
+```
+
+From the figure we can see that the algorithm converges very fast at the beginning and the MSE becomes small enough after about 50 iterations. Then more iterations does not improve the result so much.
+
+
+### c. 
+```{r, echo=FALSE}
+draw <- function(mat, main = ""){
+        image(t(mat)[,ncol(mat):1], axes = FALSE, col = rainbow(50), main=main)
+}
+par(mfrow = c(4, 5), mar = c(1, 1, 1, 1))
+for (i in 1:20){
+        draw(matrix(w[i, ], nrow = 28))
+}
+```
+
+### d. 
+I firstly draw the true  images, 
+
+```{r, echo=FALSE, fig.height=4, fig.width=6, fig.align='center'}
+test.id <- sample(1:nrow(minstbw_train), 20)
+testsample <- minstbw_train[test.id, ]
+draw <- function(mat, main = ""){
+        image(t(mat)[,ncol(mat):1], axes = FALSE, col = grey(seq(0, 1, length = 256)), main=main)
+}
+par(mfrow = c(4, 5), mar = c(1, 1, 1, 1))
+for (i in 1:20){
+        draw(t(matrix(unlist(testsample[i, ]), nrow = 28)))
+}
+```
+
+Then I draw the predicted images, 
+
+```{r, echo=FALSE, fig.height=4, fig.width=6, fig.align='center'}
+predictsample <- noisesample <- testsample
+par(mfrow = c(4, 5), mar = c(1, 1, 1, 1))
+for (i in 1:20){
+        flip.ind <- sample(1:784, round(784*0.15))
+        noisesample[i, flip.ind] <- 1 - noisesample[i, flip.ind]
+        v <- unlist(noisesample[i, ])
+        h <- 1/(1 + exp(-(w %*% v + c)))
+        hs <- ifelse(h > 0.5, 1, 0)
+        vr <- 1/(1 + exp(-(t(w) %*% hs + b)))
+        predictsample[i, ] <- ifelse(vr > 0.5, 1, 0)
+        draw(t(matrix(unlist(predictsample[i, ]), nrow = 28)))
+}
+```

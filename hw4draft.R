@@ -30,7 +30,7 @@ for (k in 1:K){
                 sample.ind <- sample(1:nrow(minstbw_train), 
                                      params[k, "batch_size"])
                 err <- numeric(params[k, "niter"])
-                for (i in 1:params[1, "batch_size"]){
+                for (i in 1:params[k, "batch_size"]){
                         v <- unlist(minstbw_train[sample.ind[i], ])
                         h <- 1/(1 + exp(-(w %*% v + c)))
                         hs <- ifelse(h > 0.5, 1, 0)

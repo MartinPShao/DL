@@ -34,11 +34,11 @@ UPDATE_b2 <- function(delta, b2, alpha){
         return(b2 - alpha * apply(delta$delta3, 1, mean))
 }
 single_autoencoder <- function(input, 
-                               alpha = 0.1, # learning rate
+                               alpha = 0.01, # learning rate
                                beta = 0, # KL sparseness penalty
-                               lambda = 0, # regularization penalty
+                               lambda = 0.01, # regularization penalty
                                maxiter = 10, # maximum iteration times
-                               n = 100, # number of hidden layers
+                               n = 10, # number of hidden layers
                                rho = 0.05, # sparsity parameter
                                tol = 1e-4, # tolerance
                                m = round(nrow(input)/10) # mini-batch size
@@ -69,10 +69,10 @@ single_autoencoder <- function(input,
                 Q_cur <- sum((y - fp$y)^2)/m/2
                 Q <- c(Q, Q_cur)
                 cat("Iteration: ",i,", Q=",Q[i],"\n",sep="")
-                if (abs(Q_cur - Q_past) <= tol) break
+                # if (abs(Q_cur - Q_past) <= tol) break
         }
         return(list(W1 = W1, b1 = b1, W2 = W2, b2 = b2, err = Q, iter = i))
 }
 start.time <- Sys.time()
-tt <- single_autoencoder(minst0_train[1:100, ], m = 20)
+tt <- single_autoencoder(minst0_train[1:1000, ], m = 1, maxiter = 10)
 dur <- Sys.time() - start.time
